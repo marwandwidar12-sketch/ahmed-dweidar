@@ -39,6 +39,7 @@ footer{text-align:center;color:var(--mut);font-size:14px;padding:0 16px 24px}
 #bar button{font-family:inherit;font-size:16px;padding:2px 14px;border:1px solid var(--bd);border-radius:10px;background:transparent;color:var(--tx)}
 main{padding-bottom:130px!important}
 #ph{width:150px;height:150px;border-radius:50%;margin:4px auto;border:4px solid var(--ac2);background:url(photo.jpg) 39.5% 13.4%/290% auto no-repeat;filter:contrast(1.08) saturate(1.05) brightness(1.03)}
+#rc{font-family:inherit;font-size:18px;padding:6px 12px;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--tx);margin:6px 0}
 </style>
 </head>
 <body>
@@ -78,9 +79,24 @@ $("nav").querySelectorAll("button").forEach(function(b){b.onclick=function(){cur
 function view(){var h="",m=$("m");
 if(cur=="q"){h='<div class="tool"><button id="fp">أ+</button><button id="fm">أ−</button></div>'+Q.map(function(s,i){return '<details class="card"'+(i==0?" open":"")+'><summary>'+s[0]+'</summary><p class="q" style="font-family:Amiri,serif">'+s[1]+'</p></details>'}).join("");
 m.innerHTML=h;$("fp").onclick=function(){fs=Math.min(40,fs+3);m.style.setProperty("--fs",fs+"px")};$("fm").onclick=function(){fs=Math.max(18,fs-3);m.style.setProperty("--fs",fs+"px")};return}
-if(cur=="aud"){m.innerHTML='<div class="card c">المصحف المرتّل بصوت الشيخ محمد صديق المنشاوي رحمه الله<br><span class="src">يحتاج اتصالًا بالإنترنت</span></div><div class="grid">'+NAMES.map(function(n,i){return '<button class="sb'+(i==S?" on":"")+'" data-i="'+i+'">'+(i+1)+". "+n+'</button>'}).join("")+'</div>';
+if(cur=="aud"){m.innerHTML='<div class="card c">اختر الشيخ:<br><select id="rc">'+REC.map(function(r,i){return '<option value="'+i+'"'+(i==R?" selected":"")+'>'+r.n+'</option>'}).join("")+'</select><br><span class="src">يحتاج اتصالًا بالإنترنت</span></div><div class="grid">'+NAMES.map(function(n,i){return '<button class="sb'+(i==S?" on":"")+'" data-i="'+i+'">'+(i+1)+". "+n+'</button>'}).join("")+'</div>';
+$("rc").onchange=function(){R=+this.value;if(S>=0)play(S)};
 m.querySelectorAll(".sb").forEach(function(b){b.onclick=function(){play(+b.dataset.i)}});return}
 if(cur=="tb"){m.innerHTML='<div class="card c"><div>اضغط للتسبيح</div><button id="tb">'+tc+'</button><button class="cnt" id="rs">إعادة</button></div>';
+$("tb").onclick=function(){tc++;this.textContent=tc;if(navigator.vibrate&&tc%33==0)navigator.vibrate(60)};$("rs").onclick=function(){tc=0;$("tb").textContent=0};return}
+m.innerHTML=AZ[cur].map(function(a,i){var k=cur+i,left=done[k]===undefined?a[1]:done[k];
+return '<div class="card"><div class="q" style="font-size:22px">'+a[0]+'</div>'+(a[1]>1||left==0?'<button class="cnt'+(left==0?" done":"")+'" data-k="'+k+'" data-n="'+a[1]+'">'+(left==0?"✓ تم":"× "+left)+'</button>':'')+'</div>'}).join("");
+m.querySelectorAll("button.cnt").forEach(function(b){b.onclick=function(){var k=b.dataset.k,l=done[k]===undefined?+b.dataset.n:done[k];if(l>0)l--;done[k]=l;b.textContent=l==0?"✓ تم":"× "+l;b.className="cnt"+(l==0?" done":"")}})}
+var REC=[{n:"محمد صديق المنشاوي",u:"https://server10.mp3quran.net/minsh/"},{n:"محمود خليل الحصري",u:"https://server13.mp3quran.net/husr/"},{n:"عبد الباسط عبد الصمد",u:"https://server7.mp3quran.net/basit/"},{n:"محمد الطبلاوي",u:"https://server12.mp3quran.net/tblawi/"}],R=0;
+var NAMES="الفاتحة،البقرة،آل عمران،النساء،المائدة،الأنعام،الأعراف،الأنفال،التوبة،يونس،هود،يوسف،الرعد،إبراهيم،الحجر،النحل،الإسراء،الكهف،مريم،طه،الأنبياء،الحج،المؤمنون،النور،الفرقان،الشعراء،النمل،القصص،العنكبوت،الروم،لقمان،السجدة،الأحزاب،سبأ،فاطر،يس،الصافات،ص،الزمر،غافر،فصلت،الشورى،الزخرف،الدخان،الجاثية،الأحقاف،محمد،الفتح،الحجرات،ق،الذاريات،الطور،النجم،القمر،الرحمن،الواقعة،الحديد،المجادلة،الحشر،الممتحنة،الصف،الجمعة،المنافقون،التغابن،الطلاق،التحريم،الملك،القلم،الحاقة،المعارج،نوح،الجن،المزمل،المدثر،القيامة،الإنسان،المرسلات،النبأ،النازعات،عبس،التكوير،الانفطار،المطففين،الانشقاق،البروج،الطارق،الأعلى،الغاشية،الفجر،البلد،الشمس،الليل،الضحى،الشرح،التين،العلق،القدر،البينة،الزلزلة،العاديات،القارعة،التكاثر،العصر،الهمزة،الفيل،قريش،الماعون،الكوثر،الكافرون،النصر،المسد،الإخلاص،الفلق،الناس".split("،"),S=-1;
+function play(i){if(i<0||i>113)return;S=i;var a=$("au");a.src=REC[R].u+("00"+(i+1)).slice(-3)+".mp3";a.play().catch(function(){});$("bar").style.display="block";$("bt").textContent="سورة "+NAMES[i]+" — "+REC[R].n;if(cur=="aud")view()}
+$("au").onended=function(){play(S+1)};
+$("au").onerror=function(){$("bt").textContent="تعذّر تشغيل هذه السورة، تأكد من الاتصال أو جرّب شيخًا آخر"};
+$("pv").onclick=function(){play(S-1)};$("nx").onclick=function(){play(S+1)};
+nav();view();
+</script>
+</body>
+</html>nnerHTML='<div class="card c"><div>اضغط للتسبيح</div><button id="tb">'+tc+'</button><button class="cnt" id="rs">إعادة</button></div>';
 $("tb").onclick=function(){tc++;this.textContent=tc;if(navigator.vibrate&&tc%33==0)navigator.vibrate(60)};$("rs").onclick=function(){tc=0;$("tb").textContent=0};return}
 m.innerHTML=AZ[cur].map(function(a,i){var k=cur+i,left=done[k]===undefined?a[1]:done[k];
 return '<div class="card"><div class="q" style="font-size:22px">'+a[0]+'</div>'+(a[1]>1||left==0?'<button class="cnt'+(left==0?" done":"")+'" data-k="'+k+'" data-n="'+a[1]+'">'+(left==0?"✓ تم":"× "+left)+'</button>':'')+'</div>'}).join("");
